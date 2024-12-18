@@ -36,7 +36,7 @@ def create_project(project_name):
         run(["git", "init"], cwd=temp_dir, check=True)
         run(["git", "commit", "--allow-empty", "-m", "Initial commit"], cwd=temp_dir, check=True)
         run(["git", "remote", "add", "origin", f"{GERRIT_URL}/{project_name}"], cwd=temp_dir, check=True)
-        run(["git", "push", "origin", "master"], cwd=temp_dir, check=True)
+        run(["git", "push", "origin", "master:master"], cwd=temp_dir, check=True)
 
     resp = requests.put(f"{GERRIT_URL}/projects/{project_name}/HEAD", json={"ref": "refs/heads/master"})
     resp.raise_for_status()
