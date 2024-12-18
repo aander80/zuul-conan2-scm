@@ -1,0 +1,36 @@
+diff --git a/doc/source/examples/etc_zuul/main.yaml b/doc/source/examples/etc_zuul/main.yaml
+index b3674844e..8e2ea17cc 100644
+--- a/doc/source/examples/etc_zuul/main.yaml
++++ b/doc/source/examples/etc_zuul/main.yaml
+@@ -5,6 +5,7 @@
+         config-projects:
+           - zuul-config
+         untrusted-projects:
++          - conan-repo
+           - test1
+           - test2
+       opendev.org:
+diff --git a/doc/source/examples/etc_zuul/zuul.conf b/doc/source/examples/etc_zuul/zuul.conf
+index bb882dc33..837ee851b 100644
+--- a/doc/source/examples/etc_zuul/zuul.conf
++++ b/doc/source/examples/etc_zuul/zuul.conf
+@@ -33,6 +33,7 @@ dburi=mysql+pymysql://zuul:%(ZUUL_MYSQL_PASSWORD)s@mysql/zuul
+ listen_address=0.0.0.0
+ port=9000
+ root=http://localhost:9000
++status_url=http://localhost:9000/t/{tenant.name}/status/change/{change.number},{change.patchset}
+ 
+ [executor]
+ private_key_file=/var/ssh/nodepool
+diff --git a/doc/source/examples/node-Dockerfile b/doc/source/examples/node-Dockerfile
+index b588bcf2c..af6e1a0b4 100644
+--- a/doc/source/examples/node-Dockerfile
++++ b/doc/source/examples/node-Dockerfile
+@@ -5,6 +5,7 @@ RUN apt-get update \
+         git \
+         openssh-server \
+         rsync \
++        python3.10-venv \
+     && rm -rf /var/lib/apt/lists/*
+ 
+ # If proxy environment variables supplied during build allow pass through via

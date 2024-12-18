@@ -5,3 +5,6 @@
     gate:
       jobs:
         - conan-create
+    deploy:
+      jobs:
+        - conan-create

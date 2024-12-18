@@ -14,6 +14,10 @@
         - event: change-restored
         - event: comment-added
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck
+    start-message: "Starting {pipeline.name} jobs: {status_url}"
+    start:
+      gerrit:
+        Verified: 0
     success:
       gerrit:
         Verified: 1
@@ -23,6 +27,7 @@
 
 - pipeline:
     name: gate
+    supercedes: check
     description: |
       Changes that have been approved are enqueued in order in this
       pipeline, and if they pass tests, will be merged.
@@ -33,12 +38,21 @@
         open: True
         current-patchset: True
         approval:
+          - Code-Review: 2
           - Workflow: 1
+          - Verified: [1, -2]
     trigger:
       gerrit:
         - event: comment-added
           approval:
+            - Code-Review: 2
+        - event: comment-added
+          approval:
             - Workflow: 1
+        - event: comment-added
+          approval:
+            - Verified: 1
+    start-message: "Starting {pipeline.name} jobs: {status_url}"
     start:
       gerrit:
         Verified: 0
@@ -49,3 +63,21 @@
     failure:
       gerrit:
         Verified: -2
+
+- pipeline:
+    name: deploy
+    description: |
+      Changes that have been merged are enqueued in order in this
+      pipeline, and if they pass tests, will be deployed.
+    manager: serial
+    post-review: True
+    trigger:
+      gerrit:
+        - event: change-merged
+    start-message: "Starting {pipeline.name} jobs: {status_url}"
+    start:
+      gerrit: []
+    success:
+      gerrit: []
+    failure:
+      gerrit: []
