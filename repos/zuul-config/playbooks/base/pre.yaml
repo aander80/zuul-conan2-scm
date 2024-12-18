@@ -1,0 +1,6 @@
+- hosts: all
+  roles:
+    - add-build-sshkey
+    - log-inventory
+    - start-zuul-console
+    - prepare-workspace-git

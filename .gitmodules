@@ -1,0 +1,3 @@
+[submodule "zuul"]
+	path = zuul
+	url = https://opendev.org/zuul/zuul.git

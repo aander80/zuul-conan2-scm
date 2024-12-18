@@ -1,0 +1,40 @@
+- hosts: all
+
+  environment:
+    CONAN_HOME: "{{ workspace }}/.conan2"
+    PATH: "{{ workspace }}/venv/bin:{{ ansible_env.PATH }}"
+
+  tasks:
+    - name: Set Gerrit origin
+      command: "git remote set-url origin ssh://localhost:29418/{{ zuul.project.name }}"
+      args:
+        chdir: "{{ workspace }}/{{ zuul.project.src_dir }}"
+
+    - name: Create venv
+      command: "python3 -m venv {{ workspace }}/venv"
+
+    - name: Install conan
+      command: "{{ workspace }}/venv/bin/pip install conan"
+
+    - name: Create conan profile
+      command: conan profile detect --force
+
+    - name: Conan inspect
+      command: conan inspect . --format json
+      args:
+        chdir: "{{ workspace }}/{{ zuul.project.src_dir }}"
+      register: conan_inspect
+
+    - block:
+        - name: Conan create
+          command: conan create .
+          args:
+            chdir: "{{ workspace }}/{{ zuul.project.src_dir }}"
+
+      always:
+        - name: Print conandata
+          shell: "cat $(conan cache path {{ name }}/{{ version }})/conandata.yml"
+          vars:
+            name: "{{ stdout_json.name }}"
+            version: "{{ stdout_json.version }}"
+            stdout_json: "{{ conan_inspect.stdout | from_json }}"

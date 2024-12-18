@@ -1,0 +1,7 @@
+- project:
+    check:
+      jobs:
+        - conan-create
+    gate:
+      jobs:
+        - conan-create
