@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import random
+import re
 import string
 import sys
 from argparse import ArgumentParser
@@ -45,6 +46,17 @@ def create_change(repo_name, commit_message, merge=False):
         run(["git", "add", random_file], cwd=temp_dir, check=True)
         run(["git", "commit", "-m", commit_message], cwd=temp_dir, check=True)
         run(["git", "push", "origin", "HEAD:refs/for/master"], cwd=temp_dir, check=True)
+
+        # Get change ID
+        result = run(["git", "log", "-1", "--pretty=%B"], cwd=temp_dir, capture_output=True, text=True, check=True)
+        change_id = re.search(r"Change-Id:\s(I[a-f0-9]+)", result.stdout).group(1)
+
+        # Approve
+        resp = requests.post(
+            f"{GERRIT_URL}/changes/{repo_name}~master~{change_id}/revisions/current/review",
+            json={"message": "Looks good to me", "labels": {"Code-Review": 2, "Workflow": 1}},
+        )
+        resp.raise_for_status()
 
         if merge:
             print("Merging change")
